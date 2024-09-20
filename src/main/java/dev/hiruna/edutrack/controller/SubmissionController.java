@@ -1,7 +1,7 @@
 package dev.hiruna.edutrack.controller;
 
-import dev.hiruna.edutrack.entity.Submission;
-import dev.hiruna.edutrack.repository.SubmissionRepository;
+import dev.hiruna.edutrack.dto.SubmissionDTO;
+import dev.hiruna.edutrack.service.SubmissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,40 +12,30 @@ import java.util.List;
 public class SubmissionController {
 
     @Autowired
-    private SubmissionRepository submissionRepository;
+    private SubmissionService submissionService;
 
     @GetMapping
-    public List<Submission> getAllSubmissions() {
-        return submissionRepository.findAll();
+    public List<SubmissionDTO> getAllSubmissions() {
+        return submissionService.getAllSubmissions();
     }
 
     @GetMapping("/{id}")
-    public Submission getSubmissionById(@PathVariable Integer id) {
-        return submissionRepository.findById(id).orElse(null);
+    public SubmissionDTO getSubmissionById(@PathVariable Integer id) {
+        return submissionService.getSubmissionById(id);
     }
 
     @PostMapping
-    public Submission createSubmission(@RequestBody Submission submission) {
-        return submissionRepository.save(submission);
+    public SubmissionDTO createSubmission(@RequestBody SubmissionDTO submissionDTO) {
+        return submissionService.createSubmission(submissionDTO);
     }
 
     @PutMapping("/{id}")
-    public Submission updateSubmission(@PathVariable Integer id, @RequestBody Submission submissionDetails) {
-        Submission submission = submissionRepository.findById(id).orElse(null);
-        if (submission != null) {
-            submission.setObtainedMarks(submissionDetails.getObtainedMarks());
-            submission.setFeedback(submissionDetails.getFeedback());
-            submission.setIsLate(submissionDetails.getIsLate());
-            submission.setSubmissionDate(submissionDetails.getSubmissionDate());
-            submission.setSubmissionFileUrl(submissionDetails.getSubmissionFileUrl());
-            submission.setIsFinalVersion(submissionDetails.getIsFinalVersion());
-            return submissionRepository.save(submission);
-        }
-        return null;
+    public SubmissionDTO updateSubmission(@PathVariable Integer id, @RequestBody SubmissionDTO submissionDTO) {
+        return submissionService.updateSubmission(id, submissionDTO);
     }
 
     @DeleteMapping("/{id}")
     public void deleteSubmission(@PathVariable Integer id) {
-        submissionRepository.deleteById(id);
+        submissionService.deleteSubmission(id);
     }
 }
