@@ -1,7 +1,7 @@
 package dev.hiruna.edutrack.controller;
 
-import dev.hiruna.edutrack.entity.Enrollment;
-import dev.hiruna.edutrack.repository.EnrollmentRepository;
+import dev.hiruna.edutrack.dto.EnrollmentDTO;
+import dev.hiruna.edutrack.service.EnrollmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,36 +12,30 @@ import java.util.List;
 public class EnrollmentController {
 
     @Autowired
-    private EnrollmentRepository enrollmentRepository;
+    private EnrollmentService enrollmentService;
 
     @GetMapping
-    public List<Enrollment> getAllEnrollments() {
-        return enrollmentRepository.findAll();
+    public List<EnrollmentDTO> getAllEnrollments() {
+        return enrollmentService.getAllEnrollments();
     }
 
     @GetMapping("/{id}")
-    public Enrollment getEnrollmentById(@PathVariable Integer id) {
-        return enrollmentRepository.findById(id).orElse(null);
+    public EnrollmentDTO getEnrollmentById(@PathVariable Integer id) {
+        return enrollmentService.getEnrollmentById(id);
     }
 
     @PostMapping
-    public Enrollment createEnrollment(@RequestBody Enrollment enrollment) {
-        return enrollmentRepository.save(enrollment);
+    public EnrollmentDTO createEnrollment(@RequestBody EnrollmentDTO enrollmentDTO) {
+        return enrollmentService.createEnrollment(enrollmentDTO);
     }
 
     @PutMapping("/{id}")
-    public Enrollment updateEnrollment(@PathVariable Integer id, @RequestBody Enrollment enrollmentDetails) {
-        Enrollment enrollment = enrollmentRepository.findById(id).orElse(null);
-        if (enrollment != null) {
-            enrollment.setEnrollmentStatus(enrollmentDetails.getEnrollmentStatus());
-            enrollment.setEnrollmentDate(enrollmentDetails.getEnrollmentDate());
-            return enrollmentRepository.save(enrollment);
-        }
-        return null;
+    public EnrollmentDTO updateEnrollment(@PathVariable Integer id, @RequestBody EnrollmentDTO enrollmentDTO) {
+        return enrollmentService.updateEnrollment(id, enrollmentDTO);
     }
 
     @DeleteMapping("/{id}")
     public void deleteEnrollment(@PathVariable Integer id) {
-        enrollmentRepository.deleteById(id);
+        enrollmentService.deleteEnrollment(id);
     }
 }
