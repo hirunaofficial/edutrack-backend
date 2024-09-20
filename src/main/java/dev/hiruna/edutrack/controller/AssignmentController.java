@@ -1,7 +1,7 @@
 package dev.hiruna.edutrack.controller;
 
-import dev.hiruna.edutrack.entity.Assignment;
-import dev.hiruna.edutrack.repository.AssignmentRepository;
+import dev.hiruna.edutrack.dto.AssignmentDTO;
+import dev.hiruna.edutrack.service.AssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,42 +12,30 @@ import java.util.List;
 public class AssignmentController {
 
     @Autowired
-    private AssignmentRepository assignmentRepository;
+    private AssignmentService assignmentService;
 
     @GetMapping
-    public List<Assignment> getAllAssignments() {
-        return assignmentRepository.findAll();
+    public List<AssignmentDTO> getAllAssignments() {
+        return assignmentService.getAllAssignments();
     }
 
     @GetMapping("/{id}")
-    public Assignment getAssignmentById(@PathVariable Integer id) {
-        return assignmentRepository.findById(id).orElse(null);
+    public AssignmentDTO getAssignmentById(@PathVariable Integer id) {
+        return assignmentService.getAssignmentById(id);
     }
 
     @PostMapping
-    public Assignment createAssignment(@RequestBody Assignment assignment) {
-        return assignmentRepository.save(assignment);
+    public AssignmentDTO createAssignment(@RequestBody AssignmentDTO assignmentDTO) {
+        return assignmentService.createAssignment(assignmentDTO);
     }
 
     @PutMapping("/{id}")
-    public Assignment updateAssignment(@PathVariable Integer id, @RequestBody Assignment assignmentDetails) {
-        Assignment assignment = assignmentRepository.findById(id).orElse(null);
-        if (assignment != null) {
-            assignment.setTitle(assignmentDetails.getTitle());
-            assignment.setDescription(assignmentDetails.getDescription());
-            assignment.setDeadline(assignmentDetails.getDeadline());
-            assignment.setFileUrl(assignmentDetails.getFileUrl());
-            assignment.setIsVersioned(assignmentDetails.getIsVersioned());
-            assignment.setTotalMarks(assignmentDetails.getTotalMarks());
-            assignment.setAllowLateSubmissions(assignmentDetails.getAllowLateSubmissions());
-            assignment.setLateSubmissionDeadline(assignmentDetails.getLateSubmissionDeadline());
-            return assignmentRepository.save(assignment);
-        }
-        return null;
+    public AssignmentDTO updateAssignment(@PathVariable Integer id, @RequestBody AssignmentDTO assignmentDTO) {
+        return assignmentService.updateAssignment(id, assignmentDTO);
     }
 
     @DeleteMapping("/{id}")
     public void deleteAssignment(@PathVariable Integer id) {
-        assignmentRepository.deleteById(id);
+        assignmentService.deleteAssignment(id);
     }
 }
