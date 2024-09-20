@@ -1,7 +1,7 @@
 package dev.hiruna.edutrack.controller;
 
-import dev.hiruna.edutrack.entity.Course;
-import dev.hiruna.edutrack.repository.CourseRepository;
+import dev.hiruna.edutrack.dto.CourseDTO;
+import dev.hiruna.edutrack.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,40 +12,30 @@ import java.util.List;
 public class CourseController {
 
     @Autowired
-    private CourseRepository courseRepository;
+    private CourseService courseService;
 
     @GetMapping
-    public List<Course> getAllCourses() {
-        return courseRepository.findAll();
+    public List<CourseDTO> getAllCourses() {
+        return courseService.getAllCourses();
     }
 
     @GetMapping("/{id}")
-    public Course getCourseById(@PathVariable Integer id) {
-        return courseRepository.findById(id).orElse(null);
+    public CourseDTO getCourseById(@PathVariable Integer id) {
+        return courseService.getCourseById(id);
     }
 
     @PostMapping
-    public Course createCourse(@RequestBody Course course) {
-        return courseRepository.save(course);
+    public CourseDTO createCourse(@RequestBody CourseDTO courseDTO) {
+        return courseService.createCourse(courseDTO);
     }
 
     @PutMapping("/{id}")
-    public Course updateCourse(@PathVariable Integer id, @RequestBody Course courseDetails) {
-        Course course = courseRepository.findById(id).orElse(null);
-        if (course != null) {
-            course.setTitle(courseDetails.getTitle());
-            course.setDescription(courseDetails.getDescription());
-            course.setInstructorId(courseDetails.getInstructorId());
-            course.setCourseFileUrl(courseDetails.getCourseFileUrl());
-            course.setCategory(courseDetails.getCategory());
-            course.setDifficultyLevel(courseDetails.getDifficultyLevel());
-            return courseRepository.save(course);
-        }
-        return null;
+    public CourseDTO updateCourse(@PathVariable Integer id, @RequestBody CourseDTO courseDTO) {
+        return courseService.updateCourse(id, courseDTO);
     }
 
     @DeleteMapping("/{id}")
     public void deleteCourse(@PathVariable Integer id) {
-        courseRepository.deleteById(id);
+        courseService.deleteCourse(id);
     }
 }
