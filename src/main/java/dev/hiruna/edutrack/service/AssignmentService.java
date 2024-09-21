@@ -51,6 +51,7 @@ public class AssignmentService {
         assignmentRepository.deleteById(id);
     }
 
+    // Helper method to convert Assignment entity to DTO
     private AssignmentDTO convertToDTO(Assignment assignment) {
         return new AssignmentDTO(assignment.getId(), assignment.getTitle(), assignment.getDescription(),
                 assignment.getCourseId(), assignment.getDeadline(), assignment.getFileUrl(),
@@ -58,6 +59,7 @@ public class AssignmentService {
                 assignment.getLateSubmissionDeadline());
     }
 
+    // Helper method to convert DTO to Assignment entity
     private Assignment convertToEntity(AssignmentDTO assignmentDTO) {
         return new Assignment(assignmentDTO.getTitle(), assignmentDTO.getDescription(),
                 assignmentDTO.getCourseId(), assignmentDTO.getDeadline(), assignmentDTO.getFileUrl(),
