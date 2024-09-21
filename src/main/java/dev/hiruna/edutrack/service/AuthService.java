@@ -1,5 +1,6 @@
 package dev.hiruna.edutrack.service;
 
+import dev.hiruna.edutrack.dto.AuthResponseDTO;
 import dev.hiruna.edutrack.entity.User;
 import dev.hiruna.edutrack.repository.UserRepository;
 import dev.hiruna.edutrack.util.JWTAuthenticator;
@@ -15,10 +16,11 @@ public class AuthService {
     @Autowired
     private JWTAuthenticator jwtAuthenticator;
 
-    public String login(String email, String password) {
-        User user = userRepository.findByEmail(email);
-        if (user != null && user.getPassword().equals(password)) {
-            return jwtAuthenticator.generateJwtToken(user);
+    public AuthResponseDTO login(String email, String password) {
+        User user = userRepository.findByEmailAndPassword(email, password);
+        if (user != null) {
+            String token = jwtAuthenticator.generateJwtToken(user);
+            return new AuthResponseDTO("Bearer " + token, user.getUserType());
         }
         return null;
     }

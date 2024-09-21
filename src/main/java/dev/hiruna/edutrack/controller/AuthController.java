@@ -1,5 +1,6 @@
 package dev.hiruna.edutrack.controller;
 
+import dev.hiruna.edutrack.dto.AuthResponseDTO;
 import dev.hiruna.edutrack.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +14,12 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String email, @RequestParam String password) {
-        String token = authService.login(email, password);
-        if (token != null) {
-            return ResponseEntity.ok("Bearer " + token);
+    public ResponseEntity<AuthResponseDTO> login(@RequestParam String email, @RequestParam String password) {
+        AuthResponseDTO authResponse = authService.login(email, password);
+        if (authResponse != null) {
+            return ResponseEntity.ok(authResponse);
         } else {
-            return ResponseEntity.status(401).body("Invalid email or password");
+            return ResponseEntity.status(401).body(null);
         }
     }
 }

@@ -26,4 +26,8 @@ public class User {
         this.password = password;
         this.role = telephone;
     }
+
+    public String getUserType() {
+        return role;
+    }
 }

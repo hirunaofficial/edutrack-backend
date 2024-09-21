@@ -14,20 +14,28 @@ import java.util.Date;
 @Component
 public class JWTAuthenticator {
 
-    Dotenv dotenv = Dotenv.configure()
-            .directory("/src/main/resources")
-            .filename(".env") //
-            .load();
-
-    //node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-    private final String jwtSecret = dotenv.get("SECRET_KEY"); // Secret Key
+    private final Dotenv dotenv;
+    private final String jwtSecret;
     private final long jwtExpirationMs = 86400000; // 1 day in milliseconds
+
+    public JWTAuthenticator() {
+        dotenv = Dotenv.configure()
+                .directory("./") // Ensure the correct directory is referenced
+                .filename(".env") // Use proper filename for environment variables
+                .load();
+
+        jwtSecret = dotenv.get("SECRET_KEY");
+
+        if (jwtSecret == null || jwtSecret.isEmpty()) {
+            throw new IllegalStateException("JWT Secret Key is not configured in the .env file.");
+        }
+    }
 
     public String generateJwtToken(User user) {
         return Jwts.builder()
-                .subject(user.getEmail())
-                .issuedAt(new Date())
-                .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .setSubject(user.getEmail())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
     }
