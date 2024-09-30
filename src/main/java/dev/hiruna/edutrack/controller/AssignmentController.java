@@ -1,6 +1,7 @@
 package dev.hiruna.edutrack.controller;
 
 import dev.hiruna.edutrack.dto.AssignmentDTO;
+import dev.hiruna.edutrack.dto.ResponseDTO;
 import dev.hiruna.edutrack.service.AssignmentService;
 import dev.hiruna.edutrack.util.JWTAuthenticator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,46 +22,57 @@ public class AssignmentController {
     private JWTAuthenticator jwtAuthenticator;
 
     @GetMapping
-    public ResponseEntity<List<AssignmentDTO>> getAllAssignments(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<ResponseDTO<List<AssignmentDTO>>> getAllAssignments(@RequestHeader("Authorization") String authHeader) {
         if (jwtAuthenticator.validateJwtToken(authHeader)) {
-            return new ResponseEntity<>(assignmentService.getAllAssignments(), HttpStatus.OK);
+            List<AssignmentDTO> assignments = assignmentService.getAllAssignments();
+            ResponseDTO<List<AssignmentDTO>> response = new ResponseDTO<>("success", "Assignments fetched successfully", assignments);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        ResponseDTO<List<AssignmentDTO>> response = new ResponseDTO<>("error", "Unauthorized access", null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AssignmentDTO> getAssignmentById(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id) {
+    public ResponseEntity<ResponseDTO<AssignmentDTO>> getAssignmentById(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id) {
         if (jwtAuthenticator.validateJwtToken(authHeader)) {
             AssignmentDTO assignmentDTO = assignmentService.getAssignmentById(id);
-            return new ResponseEntity<>(assignmentDTO, HttpStatus.OK);
+            ResponseDTO<AssignmentDTO> response = new ResponseDTO<>("success", "Assignment fetched successfully", assignmentDTO);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        ResponseDTO<AssignmentDTO> response = new ResponseDTO<>("error", "Unauthorized access", null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping
-    public ResponseEntity<AssignmentDTO> createAssignment(@RequestHeader("Authorization") String authHeader, @RequestBody AssignmentDTO assignmentDTO) {
+    public ResponseEntity<ResponseDTO<AssignmentDTO>> createAssignment(@RequestHeader("Authorization") String authHeader, @RequestBody AssignmentDTO assignmentDTO) {
         if (jwtAuthenticator.validateJwtToken(authHeader)) {
             AssignmentDTO createdAssignment = assignmentService.createAssignment(assignmentDTO);
-            return new ResponseEntity<>(createdAssignment, HttpStatus.CREATED);
+            ResponseDTO<AssignmentDTO> response = new ResponseDTO<>("success", "Assignment created successfully", createdAssignment);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        ResponseDTO<AssignmentDTO> response = new ResponseDTO<>("error", "Unauthorized access", null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AssignmentDTO> updateAssignment(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id, @RequestBody AssignmentDTO assignmentDTO) {
+    public ResponseEntity<ResponseDTO<AssignmentDTO>> updateAssignment(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id, @RequestBody AssignmentDTO assignmentDTO) {
         if (jwtAuthenticator.validateJwtToken(authHeader)) {
             AssignmentDTO updatedAssignment = assignmentService.updateAssignment(id, assignmentDTO);
-            return new ResponseEntity<>(updatedAssignment, HttpStatus.OK);
+            ResponseDTO<AssignmentDTO> response = new ResponseDTO<>("success", "Assignment updated successfully", updatedAssignment);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        ResponseDTO<AssignmentDTO> response = new ResponseDTO<>("error", "Unauthorized access", null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAssignment(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id) {
+    public ResponseEntity<ResponseDTO<Void>> deleteAssignment(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id) {
         if (jwtAuthenticator.validateJwtToken(authHeader)) {
             assignmentService.deleteAssignment(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            ResponseDTO<Void> response = new ResponseDTO<>("success", "Assignment deleted successfully", null);
+            return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        ResponseDTO<Void> response = new ResponseDTO<>("error", "Unauthorized access", null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 }

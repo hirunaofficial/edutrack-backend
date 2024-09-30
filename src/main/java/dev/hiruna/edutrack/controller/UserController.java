@@ -1,6 +1,7 @@
 package dev.hiruna.edutrack.controller;
 
 import dev.hiruna.edutrack.dto.UserDTO;
+import dev.hiruna.edutrack.dto.ResponseDTO;
 import dev.hiruna.edutrack.service.UserService;
 import dev.hiruna.edutrack.util.JWTAuthenticator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,46 +22,57 @@ public class UserController {
     private JWTAuthenticator jwtAuthenticator;
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<ResponseDTO<List<UserDTO>>> getAllUsers(@RequestHeader("Authorization") String authHeader) {
         if (jwtAuthenticator.validateJwtToken(authHeader)) {
-            return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
+            List<UserDTO> users = userService.getAllUsers();
+            ResponseDTO<List<UserDTO>> response = new ResponseDTO<>("success", "Users fetched successfully", users);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        ResponseDTO<List<UserDTO>> response = new ResponseDTO<>("error", "Unauthorized access", null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id) {
+    public ResponseEntity<ResponseDTO<UserDTO>> getUserById(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id) {
         if (jwtAuthenticator.validateJwtToken(authHeader)) {
             UserDTO userDTO = userService.getUserById(id);
-            return new ResponseEntity<>(userDTO, HttpStatus.OK);
+            ResponseDTO<UserDTO> response = new ResponseDTO<>("success", "User fetched successfully", userDTO);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        ResponseDTO<UserDTO> response = new ResponseDTO<>("error", "Unauthorized access", null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestHeader("Authorization") String authHeader, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<ResponseDTO<UserDTO>> createUser(@RequestHeader("Authorization") String authHeader, @RequestBody UserDTO userDTO) {
         if (jwtAuthenticator.validateJwtToken(authHeader)) {
             UserDTO createdUser = userService.createUser(userDTO);
-            return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+            ResponseDTO<UserDTO> response = new ResponseDTO<>("success", "User created successfully", createdUser);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        ResponseDTO<UserDTO> response = new ResponseDTO<>("error", "Unauthorized access", null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<ResponseDTO<UserDTO>> updateUser(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id, @RequestBody UserDTO userDTO) {
         if (jwtAuthenticator.validateJwtToken(authHeader)) {
             UserDTO updatedUser = userService.updateUser(id, userDTO);
-            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+            ResponseDTO<UserDTO> response = new ResponseDTO<>("success", "User updated successfully", updatedUser);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        ResponseDTO<UserDTO> response = new ResponseDTO<>("error", "Unauthorized access", null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id) {
+    public ResponseEntity<ResponseDTO<Void>> deleteUser(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id) {
         if (jwtAuthenticator.validateJwtToken(authHeader)) {
             userService.deleteUser(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            ResponseDTO<Void> response = new ResponseDTO<>("success", "User deleted successfully", null);
+            return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        ResponseDTO<Void> response = new ResponseDTO<>("error", "Unauthorized access", null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 }
