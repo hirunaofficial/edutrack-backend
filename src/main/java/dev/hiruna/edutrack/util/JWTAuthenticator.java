@@ -3,8 +3,7 @@ package dev.hiruna.edutrack.util;
 import dev.hiruna.edutrack.entity.User;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
@@ -14,14 +13,13 @@ import java.util.Date;
 @Component
 public class JWTAuthenticator {
 
-    private final Dotenv dotenv;
     private final String jwtSecret;
     private final long jwtExpirationMs = 86400000; // 1 day in milliseconds
 
     public JWTAuthenticator() {
-        dotenv = Dotenv.configure()
-                .directory("./") // Ensure the correct directory is referenced
-                .filename(".env") // Use proper filename for environment variables
+        Dotenv dotenv = Dotenv.configure()
+                .directory("./")
+                .filename(".env")
                 .load();
 
         jwtSecret = dotenv.get("SECRET_KEY");
@@ -33,24 +31,33 @@ public class JWTAuthenticator {
 
     public String generateJwtToken(User user) {
         return Jwts.builder()
-                .setSubject(user.getEmail())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(key(), SignatureAlgorithm.HS256)
-                .compact();
+                .subject(user.getEmail())
+                .issuedAt(new Date())
+                .expiration(new Date(new Date().getTime() + jwtExpirationMs))
+                .signWith(key())
+                .compact();  // Generate the JWT string
     }
 
     private SecretKey key() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
     public boolean validateJwtToken(String authToken) {
-        String jwtToken = authToken.substring("Bearer ".length());
+        if (!authToken.startsWith("Bearer ")) {
+            return false;
+        }
+
+        String jwtToken = authToken.substring(7);
+
         try {
-            Jwts.parser().setSigningKey(key()).build().parse(jwtToken);
+            Jwts.parser()
+                    .verifyWith(key())
+                    .build()
+                    .parseSignedClaims(jwtToken);
+
             return true;
-        } catch (Exception e) {
-            System.out.println("Invalid JWT token: " + e.getMessage());
+        } catch (JwtException e) {
+            System.out.println("Invalid JWT: " + e.getMessage());
         }
         return false;
     }
