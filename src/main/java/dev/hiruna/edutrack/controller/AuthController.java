@@ -1,6 +1,7 @@
 package dev.hiruna.edutrack.controller;
 
 import dev.hiruna.edutrack.dto.AuthResponseDTO;
+import dev.hiruna.edutrack.dto.LoginRequestDTO;
 import dev.hiruna.edutrack.dto.ResponseDTO;
 import dev.hiruna.edutrack.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,8 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<ResponseDTO<AuthResponseDTO>> login(@RequestParam String email, @RequestParam String password) {
-        AuthResponseDTO authResponse = authService.login(email, password);
+    public ResponseEntity<ResponseDTO<AuthResponseDTO>> login(@RequestBody LoginRequestDTO loginRequest) {
+        AuthResponseDTO authResponse = authService.login(loginRequest.getEmail(), loginRequest.getPassword());
         if (authResponse != null) {
             ResponseDTO<AuthResponseDTO> response = new ResponseDTO<>("success", "Login successful", authResponse);
             return new ResponseEntity<>(response, HttpStatus.OK);
