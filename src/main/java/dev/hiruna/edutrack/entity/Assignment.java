@@ -22,7 +22,7 @@ public class Assignment {
     @GenericGenerator(name = "generator", strategy = "increment")
     @GeneratedValue(generator = "generator")
     private Integer id;
-
+    private Integer uploadedBy;
     private String title;
     private String description;
     private String courseId;
@@ -36,7 +36,8 @@ public class Assignment {
     @OneToMany(mappedBy = "assignment")
     private List<Submission> submissions;
 
-    public Assignment(String title, String description, String courseId, Date deadline, String fileUrl, Boolean isVersioned, Integer totalMarks, Boolean allowLateSubmissions, Date lateSubmissionDeadline) {
+    public Assignment(Integer uploadedBy, String title, String description, String courseId, Date deadline, String fileUrl, Boolean isVersioned, Integer totalMarks, Boolean allowLateSubmissions, Date lateSubmissionDeadline) {
+        this.uploadedBy = uploadedBy;
         this.title = title;
         this.description = description;
         this.courseId = courseId;

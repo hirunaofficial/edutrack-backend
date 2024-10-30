@@ -33,6 +33,7 @@ public class AssignmentService {
     public AssignmentDTO updateAssignment(Integer id, AssignmentDTO assignmentDTO) {
         Assignment assignment = assignmentRepository.findById(id).orElse(null);
         if (assignment != null) {
+            assignment.setUploadedBy(assignmentDTO.getUploadedBy());
             assignment.setTitle(assignmentDTO.getTitle());
             assignment.setDescription(assignmentDTO.getDescription());
             assignment.setDeadline(assignmentDTO.getDeadline());
@@ -53,15 +54,15 @@ public class AssignmentService {
 
     // Helper method to convert Assignment entity to DTO
     private AssignmentDTO convertToDTO(Assignment assignment) {
-        return new AssignmentDTO(assignment.getId(), assignment.getTitle(), assignment.getDescription(),
-                assignment.getCourseId(), assignment.getDeadline(), assignment.getFileUrl(),
-                assignment.getIsVersioned(), assignment.getTotalMarks(), assignment.getAllowLateSubmissions(),
-                assignment.getLateSubmissionDeadline());
+        return new AssignmentDTO(assignment.getId(), assignment.getUploadedBy(), assignment.getTitle(),
+                assignment.getDescription(), assignment.getCourseId(), assignment.getDeadline(),
+                assignment.getFileUrl(), assignment.getIsVersioned(), assignment.getTotalMarks(),
+                assignment.getAllowLateSubmissions(), assignment.getLateSubmissionDeadline());
     }
 
     // Helper method to convert DTO to Assignment entity
     private Assignment convertToEntity(AssignmentDTO assignmentDTO) {
-        return new Assignment(assignmentDTO.getTitle(), assignmentDTO.getDescription(),
+        return new Assignment(assignmentDTO.getUploadedBy(), assignmentDTO.getTitle(), assignmentDTO.getDescription(),
                 assignmentDTO.getCourseId(), assignmentDTO.getDeadline(), assignmentDTO.getFileUrl(),
                 assignmentDTO.getIsVersioned(), assignmentDTO.getTotalMarks(),
                 assignmentDTO.getAllowLateSubmissions(), assignmentDTO.getLateSubmissionDeadline());

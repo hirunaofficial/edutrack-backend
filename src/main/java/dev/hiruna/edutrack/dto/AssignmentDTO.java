@@ -11,6 +11,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class AssignmentDTO {
     private Integer id;
+    private Integer uploadedBy;
     private String title;
     private String description;
     private String courseId;
