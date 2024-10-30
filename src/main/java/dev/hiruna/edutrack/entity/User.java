@@ -18,13 +18,15 @@ public class User {
     @GeneratedValue(generator="generator")
     private Integer id;
     private String email;
+    private String phoneNumber;
     private String password;
     private String role;
 
-    public User(String email, String password, String telephone) {
+    public User(String email, String password, String phoneNumber, String role) {
         this.email = email;
         this.password = password;
-        this.role = telephone;
+        this.phoneNumber = phoneNumber;
+        this.role = role;
     }
 
     public String getUserType() {

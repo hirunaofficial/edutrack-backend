@@ -35,6 +35,7 @@ public class UserService {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
             user.setEmail(userDTO.getEmail());
+            user.setPhoneNumber(userDTO.getPhoneNumber());
             user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // Hash the new password
             user.setRole(userDTO.getRole());
             user = userRepository.save(user);
@@ -67,11 +68,11 @@ public class UserService {
 
     // Helper method to convert User entity to DTO, excluding the password
     private UserDTO convertToDTOWithoutPassword(User user) {
-        return new UserDTO(user.getId(), user.getEmail(), null, user.getRole()); // Set password to null
+        return new UserDTO(user.getId(), user.getEmail(), user.getPhoneNumber(), null, user.getRole());
     }
 
     // Helper method to convert DTO to User entity
     private User convertToEntity(UserDTO userDTO) {
-        return new User(userDTO.getEmail(), userDTO.getPassword(), userDTO.getRole());
+        return new User(userDTO.getEmail(), userDTO.getPhoneNumber(), userDTO.getPassword(), userDTO.getRole());
     }
 }
