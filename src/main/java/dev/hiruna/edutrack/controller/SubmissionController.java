@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/submissions")
@@ -21,9 +22,21 @@ public class SubmissionController {
     @Autowired
     private JWTAuthenticator jwtAuthenticator;
 
+    // Helper method to check if the user's role is "Student" or "Instructor"
+    private boolean isAuthorizedRole(String authHeader) {
+        if (jwtAuthenticator.validateJwtToken(authHeader)) {
+            Map<String, Object> payload = jwtAuthenticator.getJwtPayload(authHeader);
+            if (payload != null) {
+                String role = (String) payload.get("role");
+                return "Student".equalsIgnoreCase(role) || "Instructor".equalsIgnoreCase(role);
+            }
+        }
+        return false;
+    }
+
     @GetMapping
     public ResponseEntity<ResponseDTO<List<SubmissionDTO>>> getAllSubmissions(@RequestHeader("Authorization") String authHeader) {
-        if (jwtAuthenticator.validateJwtToken(authHeader)) {
+        if (isAuthorizedRole(authHeader)) {
             List<SubmissionDTO> submissions = submissionService.getAllSubmissions();
             ResponseDTO<List<SubmissionDTO>> response = new ResponseDTO<>("success", "Submissions fetched successfully", submissions);
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -34,7 +47,7 @@ public class SubmissionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseDTO<SubmissionDTO>> getSubmissionById(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id) {
-        if (jwtAuthenticator.validateJwtToken(authHeader)) {
+        if (isAuthorizedRole(authHeader)) {
             SubmissionDTO submissionDTO = submissionService.getSubmissionById(id);
             ResponseDTO<SubmissionDTO> response = new ResponseDTO<>("success", "Submission fetched successfully", submissionDTO);
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -45,7 +58,7 @@ public class SubmissionController {
 
     @PostMapping
     public ResponseEntity<ResponseDTO<SubmissionDTO>> createSubmission(@RequestHeader("Authorization") String authHeader, @RequestBody SubmissionDTO submissionDTO) {
-        if (jwtAuthenticator.validateJwtToken(authHeader)) {
+        if (isAuthorizedRole(authHeader)) {
             SubmissionDTO createdSubmission = submissionService.createSubmission(submissionDTO);
             ResponseDTO<SubmissionDTO> response = new ResponseDTO<>("success", "Submission created successfully", createdSubmission);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -56,7 +69,7 @@ public class SubmissionController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ResponseDTO<SubmissionDTO>> updateSubmission(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id, @RequestBody SubmissionDTO submissionDTO) {
-        if (jwtAuthenticator.validateJwtToken(authHeader)) {
+        if (isAuthorizedRole(authHeader)) {
             SubmissionDTO updatedSubmission = submissionService.updateSubmission(id, submissionDTO);
             ResponseDTO<SubmissionDTO> response = new ResponseDTO<>("success", "Submission updated successfully", updatedSubmission);
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -67,7 +80,7 @@ public class SubmissionController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseDTO<Void>> deleteSubmission(@RequestHeader("Authorization") String authHeader, @PathVariable Integer id) {
-        if (jwtAuthenticator.validateJwtToken(authHeader)) {
+        if (isAuthorizedRole(authHeader)) {
             submissionService.deleteSubmission(id);
             ResponseDTO<Void> response = new ResponseDTO<>("success", "Submission deleted successfully", null);
             return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);

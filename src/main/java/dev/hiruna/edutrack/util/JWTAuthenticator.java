@@ -2,6 +2,7 @@ package dev.hiruna.edutrack.util;
 
 import dev.hiruna.edutrack.entity.User;
 import io.github.cdimascio.dotenv.Dotenv;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.Keys;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class JWTAuthenticator {
@@ -32,6 +34,7 @@ public class JWTAuthenticator {
     public String generateJwtToken(User user) {
         return Jwts.builder()
                 .subject(user.getEmail())
+                .claim("role", user.getRole())
                 .issuedAt(new Date())
                 .expiration(new Date(new Date().getTime() + jwtExpirationMs))
                 .signWith(key())
@@ -60,5 +63,26 @@ public class JWTAuthenticator {
             System.out.println("Invalid JWT: " + e.getMessage());
         }
         return false;
+    }
+
+    public Map<String, Object> getJwtPayload(String authToken) {
+        if (!authToken.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("JWT token must start with 'Bearer '");
+        }
+
+        String jwtToken = authToken.substring(7);
+
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(key())
+                    .build()
+                    .parseSignedClaims(jwtToken)
+                    .getPayload();
+
+            return claims; // Return claims as a Map
+        } catch (JwtException e) {
+            System.out.println("Invalid JWT: " + e.getMessage());
+            return null;
+        }
     }
 }
